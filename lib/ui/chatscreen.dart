@@ -101,8 +101,6 @@ class _ChatScreenState extends State<ChatScreen> {
             (_, DataSnapshot snapshot, Animation<double> animation, int index) {
           data = snapshot.value;
 
-
-
           return message(data['sender'], data['message']);
         });
   }
