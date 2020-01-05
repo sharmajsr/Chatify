@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:metaeducator/ui/dashboard.dart';
+import 'package:metaeducator/ui/home.dart';
 import 'package:metaeducator/ui/signup.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:toast/toast.dart';
@@ -93,19 +94,7 @@ class _LoginState extends State<Login> {
           body: Stack(
             fit: StackFit.expand,
             children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only( top: 10.0),
-                    child: Center(child: Image.asset("assets/apppicedit.jpg")),
-                  ),
-                  Expanded(
-                    child: Container(),
-                  ),
-                  Image.asset("assets/image_02.png")
-                ],
-              ),
+
               SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.only(left: 28.0, right: 28.0, top: 40.0),
@@ -222,7 +211,7 @@ class _LoginState extends State<Login> {
           email: emailController.text,
           password: passwordController.text))
           .user;
-
+      print(user.uid);
 //      var d = await Firestore.instance
 //          .collection('users')
 //          .document(emailController.text)
@@ -248,8 +237,8 @@ class _LoginState extends State<Login> {
       //});
       _saving=false;
 
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MyHomePage(),));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Home(user.uid),));
     } catch (e) {
       print(e.message);
       _saving = false;

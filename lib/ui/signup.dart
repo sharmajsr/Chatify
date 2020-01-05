@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:metaeducator/ui/loginpage.dart';
@@ -12,6 +13,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  final datab = FirebaseDatabase.instance;
   bool _saving = false;
   Map data;
   bool validateName = false;
@@ -36,60 +38,42 @@ class _SignUpState extends State<SignUp> {
 
   TextEditingController mobileController = TextEditingController();
 
-
   @override
   Widget build(BuildContext context) {
     Future<void> signUp() async {
       try {
         AuthResult result = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
-            email: emailController.text, password: passwordController.text);
-        FirebaseUser user = result.user;
+                email: emailController.text, password: passwordController.text);
 
-        Firestore.instance
-            .collection("users")
-            .document((emailController.text))
-            .setData({
+        FirebaseUser user = result.user;
+        data = {
           "name": "${nameController.text}",
-          "usn": "${usnController.text}",
-          "block": "${blockController.text}",
-          "room": "${roomController.text}",
-          "mobile": "${mobileController.text}",
-          "role": "student"
+          "password": "${passwordController.text}",
+          "email": "${emailController.text}",
+          "uid": "${user.uid}"
+//
+        };
+        datab
+            .reference()
+            .child('users/' + nameController.text)
+            .set(data)
+            .catchError((e) {
+          print(e);
         });
 
         print(user);
 
-//        StreamBuilder<DocumentSnapshot>(
-//          stream: Firestore.instance.collection('users').document(user.uid).setData(data),
-//          builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot){
-//            if(snapshot.hasError){
-//              return Text('Error: ${snapshot.error}');
-//      }
-//            switch(snapshot.connectionState){
-//              case ConnectionState.waiting: return Text('Loading');
-//              default:
-//                return Text(snapshot.data['name']);
-//      }
-//      },
-//        )
-
-//        final FirebaseUser user = (await FirebaseAuth.instance
-//            .createUserWithEmailAndPassword(
-//            email: emailController.text,
-//            password: passwordController.text)).user;
         user.sendEmailVerification();
+        // _saving = false;
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => Login()));
       } catch (e) {
-        _saving=false;
-        setState(() {
-
-        });
+        _saving = false;
+        setState(() {});
         print(e.message);
         Toast.show(e.message, context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-
       }
     }
 
@@ -132,13 +116,14 @@ class _SignUpState extends State<SignUp> {
                 TextField(
                   onChanged: (value) {
                     setState(() {
-                      value.isEmpty ? validateName = true : validateName = false;
+                      value.isEmpty
+                          ? validateName = true
+                          : validateName = false;
                     });
                   },
                   controller: nameController,
                   decoration: InputDecoration(
-                      errorText:
-                      validateName ? "Name can\'t be empty" : null,
+                      errorText: validateName ? "Name can\'t be empty" : null,
                       hintText: "Name",
                       hintStyle: TextStyle(color: Colors.grey, fontSize: 12.0)),
                 ),
@@ -186,7 +171,7 @@ class _SignUpState extends State<SignUp> {
                   controller: passwordController,
                   decoration: InputDecoration(
                       errorText:
-                      validatePassword ? "Password can\'t be empty" : null,
+                          validatePassword ? "Password can\'t be empty" : null,
                       hintText: "Password",
                       hintStyle: TextStyle(color: Colors.grey, fontSize: 12.0)),
                 ),
@@ -219,18 +204,6 @@ class _SignUpState extends State<SignUp> {
                               passwordController.text.isEmpty
                                   ? validatePassword = true
                                   : validatePassword = false;
-//                              usnController.text.isEmpty
-//                                  ? validateUSN = true
-//                                  : validateUSN = false;
-//                              blockController.text.isEmpty
-//                                  ? validateBlock = true
-//                                  : validateBlock = false;
-//                              roomController.text.isEmpty
-//                                  ? validateRoom = true
-//                                  : validateRoom = false;
-//                              mobileController.text.isEmpty
-//                                  ? validateMobile = true
-//                                  : validateMobile = false;
                               nameController.text.isEmpty
                                   ? validateName = true
                                   : validateName = false;
@@ -239,21 +212,14 @@ class _SignUpState extends State<SignUp> {
                             data = {
                               "name": "${nameController.text}",
                               "password": "${passwordController.text}",
-//                              "block": "${blockController.text}",
-//                              "room": "${roomController.text}",
-                           //   "mobile": "${mobileController.text}",
-                             // "role": "student"
+                              "email": "${emailController.text}"
                             };
-                            if (!(
-                                //validateMobile &&
-//                                validateRoom &&
-//                                validateBlock &&
-                                validateName &&
+                            if (!(validateName &&
                                 validatePassword &&
-                                validateEmail
-//                                validateUSN
-                                )
-                                ){ _saving=true;signUp();}
+                                validateEmail)) {
+                              _saving = true;
+                              signUp();
+                            }
                           },
                           child: Center(
                             child: Text("SignUp",

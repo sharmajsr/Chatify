@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:metaeducator/ui/chatscreen.dart';
+import 'package:metaeducator/ui/dashboard.dart';
 import 'package:metaeducator/ui/loginpage.dart';
 
 void main() => runApp(MyApp());
