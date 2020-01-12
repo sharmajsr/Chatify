@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "667128388607",
+    "firebase_url": "https://metaeducator.firebaseio.com",
+    "project_id": "metaeducator",
+    "storage_bucket": "metaeducator.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667128388607:android:b8f75459253441387565ca",
+        "android_client_info": {
+          "package_name": "com.example.metaeducator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "667128388607-715g521o4cuukeo334nhk9b48j9lt8td.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDObA29plS7nrAOfSFQDfmAf4j5reP1sTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "667128388607-715g521o4cuukeo334nhk9b48j9lt8td.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
