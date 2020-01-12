@@ -24,21 +24,20 @@ class _HomeState extends State<Home> {
   initState() {
     super.initState();
     // Add listeners to this class
-   // unreadMessagesf();
-
+    // unreadMessagesf();
   }
 
   unreadMessagesf() async {
     unreadMessages = (await FirebaseDatabase.instance
-        .reference()
-        .child('users/umessages/')
-        .once()
-        .catchError((e) {
+            .reference()
+            .child('users/umessages/')
+            .once()
+            .catchError((e) {
       print('Error message' + e);
-
-    })).value;
+      setState(() {});
+    }))
+        .value;
     print(unreadMessages);
-
   }
 
   @override
@@ -50,35 +49,37 @@ class _HomeState extends State<Home> {
       body: firebaseList(),
     );
   }
-   calculateGid(Map data){
-     String uid = data['uid'];
-     String loggedInUid = widget.myuid;
 
-     String gid;
-     int i;
+  calculateGid(Map data) {
+    String uid = data['uid'];
+    String loggedInUid = widget.myuid;
 
-     i = uid.compareTo(loggedInUid);
-     gid = i == 1 ? uid + loggedInUid : loggedInUid + uid;
-     return gid;
+    String gid;
+    int i;
+
+    i = uid.compareTo(loggedInUid);
+    gid = i == 1 ? uid + loggedInUid : loggedInUid + uid;
+    return gid;
   }
 
-  Widget contactCard(Map data,String p) {
+  Widget contactCard(Map data, String p) {
     return InkWell(
       onTap: () async {
         String loggedInUid = widget.myuid;
         String uid = data['uid'];
         String gid;
-        gid= await calculateGid(data);
+        gid = await calculateGid(data);
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ChatScreen(gid, loggedInUid,uid, data['name']),
+              builder: (context) =>
+                  ChatScreen(gid, loggedInUid, uid, data['name']),
             ));
       },
       child: ListTile(
-        trailing: CircleAvatar(
-        child: Text(p),
-      ),
+        trailing: CircleAvatar(backgroundColor: Colors.lightGreenAccent,
+          child: Text(p),
+        ),
         leading: CircleAvatar(
           child: Text(data['name'][0]),
         ),
@@ -98,25 +99,25 @@ class _HomeState extends State<Home> {
           print(data);
           //  print('${data['sender']} ${data['message']}');
           //print(widget.myuid);
-          if(data['email'] == 'pq' ){
+          if (data['email'] == 'pq') {
             unreadMessages = data;
             return Container();
           }
 
-
-          if (  data['uid'] == widget.myuid  ) return Container();
+          if (data['uid'] == widget.myuid) return Container();
           String gid;
           Map myData;
-          String p='';
-          gid =  calculateGid(data);
+          String p = '';
+          gid = calculateGid(data);
           unreadMessagesf();
+
           if (unreadMessages.containsKey(gid)) {
             myData = unreadMessages[gid];
             p = myData[data['uid']];
             print('ispresnt');
           }
 
-          return contactCard(data,p);
+          return contactCard(data, p);
         });
   }
 }
