@@ -18,6 +18,28 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final datab = FirebaseDatabase.instance;
   Map data;
+  Map unreadMessages;
+
+  @override
+  initState() {
+    super.initState();
+    // Add listeners to this class
+   // unreadMessagesf();
+
+  }
+
+  unreadMessagesf() async {
+    unreadMessages = (await FirebaseDatabase.instance
+        .reference()
+        .child('users/umessages/')
+        .once()
+        .catchError((e) {
+      print('Error message' + e);
+
+    })).value;
+    print(unreadMessages);
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,25 +50,35 @@ class _HomeState extends State<Home> {
       body: firebaseList(),
     );
   }
+   calculateGid(Map data){
+     String uid = data['uid'];
+     String loggedInUid = widget.myuid;
 
-  Widget contactCard(Map data) {
+     String gid;
+     int i;
+
+     i = uid.compareTo(loggedInUid);
+     gid = i == 1 ? uid + loggedInUid : loggedInUid + uid;
+     return gid;
+  }
+
+  Widget contactCard(Map data,String p) {
     return InkWell(
-      onTap: () {
-        String uid = data['uid'];
+      onTap: () async {
         String loggedInUid = widget.myuid;
-
+        String uid = data['uid'];
         String gid;
-        int i;
-
-        i = uid.compareTo(loggedInUid);
-        gid = i == 1 ? uid + loggedInUid : loggedInUid + uid;
+        gid= await calculateGid(data);
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ChatScreen(gid, loggedInUid, data['name']),
+              builder: (context) => ChatScreen(gid, loggedInUid,uid, data['name']),
             ));
       },
       child: ListTile(
+        trailing: CircleAvatar(
+        child: Text(p),
+      ),
         leading: CircleAvatar(
           child: Text(data['name'][0]),
         ),
@@ -66,8 +98,25 @@ class _HomeState extends State<Home> {
           print(data);
           //  print('${data['sender']} ${data['message']}');
           //print(widget.myuid);
-          if (data['uid'] == widget.myuid) return Container();
-          return contactCard(data);
+          if(data['email'] == 'pq' ){
+            unreadMessages = data;
+            return Container();
+          }
+
+
+          if (  data['uid'] == widget.myuid  ) return Container();
+          String gid;
+          Map myData;
+          String p='';
+          gid =  calculateGid(data);
+          unreadMessagesf();
+          if (unreadMessages.containsKey(gid)) {
+            myData = unreadMessages[gid];
+            p = myData[data['uid']];
+            print('ispresnt');
+          }
+
+          return contactCard(data,p);
         });
   }
 }

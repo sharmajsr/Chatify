@@ -211,7 +211,7 @@ class _SignUpState extends State<SignUp> {
 
                             data = {
                               "name": "${nameController.text}",
-                        //      "password": "${passwordController.text}",
+//                                   "password": "${passwordController.text}",
                               "email": "${emailController.text}"
                             };
                             if (!(validateName &&

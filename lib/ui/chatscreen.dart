@@ -5,9 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
-  String gid, loggedInUid, name;
+  String gid, loggedInUid, name, uid;
 
-  ChatScreen(this.gid, this.loggedInUid, this.name);
+  ChatScreen(this.gid, this.loggedInUid, this.uid, this.name);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -15,6 +15,13 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   Map data;
+  int messageCount;
+  int unreadMessage;
+  Map setData;
+
+
+
+
   TextEditingController messageController = TextEditingController();
   String p = 'message';
   final database = FirebaseDatabase.instance.reference();
@@ -105,9 +112,80 @@ class _ChatScreenState extends State<ChatScreen> {
         });
   }
 
-  void sendData(String text) {
+  Future<Map> getMessageCount() async {
+    DataSnapshot Snapshot = await FirebaseDatabase.instance
+        .reference()
+        .child('users/umessages/')
+        .once()
+        .catchError((e) {
+      print('Error message' + e);
+      return 0;
+    });
+    int mCount;
+    //print('value');
+    print(Snapshot.value);
+    print('\n\n');
+    Map myData={};
+  //  try {
+    print('widget.gid' + widget.gid);
+      if (Snapshot.value.containsKey(widget.gid)) {
+        myData = Snapshot.value[widget.gid];
+        print('ispresnt');
+      }
+//    }catch(e){
+//      myData={};
+//    }
+
+//    print(snapshot[widget.loggedInUid]);
+//    if(snapshot[widget.loggedInUid]==null)  mCount=0;
+//    mCount=snapshot[widget.loggedInUid];
+    print('Value of my data');
+    print(myData);
+    print('\n\n');
+    return myData;
+  }
+
+  Future<void> sendData(String text) async {
+
+    setData = await getMessageCount();
+    print(setData);
+    print('\n\n');
+    String m='',n='';
+    int val=1;
+    if(setData.isNotEmpty) {
+      print('Im here ');
+      m = setData[widget.loggedInUid];
+      n = setData[widget.uid];
+      val = int.parse(m);
+      val=val+1;
+    }
+
+
+    Map nyData;
+    nyData={
+      widget.uid: "0",
+      widget.loggedInUid: "$val"
+    };
+
+    datab.reference()
+        .child('users/umessages/' + widget.gid)
+        .set(nyData).catchError((e){print(e);}).then((x){
+           //   print(myData);
+    });
+
     Map data;
     data = {"sender": widget.loggedInUid, "message": text};
     datab.reference().child('messages/' + widget.gid).push().set(data);
+
+//    getMessageCount();
+    //   messageCount=0;
+  //  print('Widget.uid ' + widget.loggedInUid);
+//    m=m+1;
+//    myData={
+//      widget.uid: "$setData[widget.uid]",
+//      widget.loggedInUid: "$m"
+//    };
+   // datab.reference().child('users/umessages/' + widget.gid).set(myData);
+    print('umessage  written');
   }
 }
